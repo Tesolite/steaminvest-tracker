@@ -12,7 +12,7 @@
     >
       <a href="index.html" class="min-w-44 max-w-[10%] self-center">
         <img
-          src="assets/images/logo-placeholder.png"
+          src="../public/assets/images/logo-placeholder.png"
           alt="Steam Investment Tracker logo"
         />
       </a>
@@ -34,5 +34,107 @@
         >
       </nav>
     </header>
+
+    <main>
+      <div class="flex flex-col items-center justify-center px-2">
+        <img
+          src="../public/assets/images/to-the-moon.png"
+          alt="image of stocks going up between earth and the moon, with text 'to the moon'"
+          class="py-4"
+        />
+        <div
+          class="flex flex-col items-start justify-center gap-4 rounded border-2 border-white border-opacity-65 bg-teal-950 p-2 sm:w-[60%]"
+        >
+          <h1 class="pb-4 text-2xl text-white sm:text-4xl">Enter item info:</h1>
+          <div class="flex w-full justify-start gap-2">
+            <label for="item-url" class="self-center text-white sm:text-2xl"
+              >Item URL:</label
+            >
+            <input
+              type="text"
+              name="item-url"
+              id="in-url"
+              class="flex-grow rounded p-1 sm:text-2xl"
+              placeholder="Marketplace URL for item"
+            />
+          </div>
+          <div class="flex w-full justify-start gap-2">
+            <label for="item-cost" class="self-center text-white sm:text-2xl"
+              >Paid:</label
+            >
+            <select
+              name="currency"
+              id="in-currency"
+              class="rounded sm:text-2xl"
+              size="1"
+            >
+              <option value="1">USD</option>
+              <option value="2">GBP</option>
+              <option value="3" selected>EUR</option>
+              <option value="4">CHF</option>
+              <option value="5">RUB</option>
+              <option value="6">PLN</option>
+              <option value="7">BRL</option>
+              <option value="8">JPY</option>
+              <option value="9">NOK</option>
+              <option value="10">IDR</option>
+              <option value="11">MYR</option>
+              <option value="12">PHP</option>
+              <option value="13">SGD</option>
+              <option value="14">THB</option>
+              <option value="15">VND</option>
+              <option value="16">KRW</option>
+              <option value="17">TRY</option>
+              <option value="18">UAH</option>
+              <option value="19">MXN</option>
+              <option value="20">CAD</option>
+              <option value="21">AUD</option>
+              <option value="22">NZD</option>
+              <option value="23">CNY</option>
+              <option value="24">INR</option>
+              <option value="25">CLP</option>
+              <option value="26">PEN</option>
+              <option value="27">COP</option>
+              <option value="28">ZAR</option>
+              <option value="29">HKD</option>
+              <option value="30">TWD</option>
+              <option value="31">SAR</option>
+              <option value="32">AED</option>
+              <option value="33" disabled>SEK</option>
+              <option value="34">ARS</option>
+              <option value="35">ILS</option>
+              <option value="36" disabled>BYN</option>
+              <option value="37">KZT</option>
+              <option value="38">KWD</option>
+              <option value="39">QAR</option>
+              <option value="40">CRC</option>
+              <option value="41">UYU</option>
+              <option value="42" disabled>BGN</option>
+              <option value="43" disabled>HRK</option>
+              <option value="44" disabled>CZK</option>
+              <option value="45" disabled>DKK</option>
+              <option value="46" disabled>HUF</option>
+              <option value="47" disabled>RON</option>
+            </select>
+            <input
+              type="number"
+              name="item-cost"
+              id="in-cost"
+              class="rounded p-1 sm:w-32 sm:text-2xl"
+              placeholder="Amount"
+            />
+          </div>
+          <p class="max-w-[80%] text-xs text-white">
+            *Greyed out currencies don't work with the used API
+          </p>
+          <button
+            type="submit"
+            class="m-4 w-1/2 self-end rounded border-2 p-2 text-white"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </main>
   </body>
 </html>
