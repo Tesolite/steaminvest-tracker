@@ -40,27 +40,49 @@
         <img
           src="../public/assets/images/to-the-moon.png"
           alt="image of stocks going up between earth and the moon, with text 'to the moon'"
-          class="py-4"
+          class="py-4 2xl:w-[30%]"
         />
-        <div
+        <form
+          action=""
           class="flex flex-col items-start justify-center gap-4 rounded border-2 border-white border-opacity-65 bg-teal-950 p-2 sm:w-[60%]"
         >
-          <h1 class="pb-4 text-2xl text-white sm:text-4xl">Enter item info:</h1>
-          <div class="flex w-full justify-start gap-2">
-            <label for="item-url" class="self-center text-white sm:text-2xl"
+          <h1 class="text-2xl text-white sm:pb-4 sm:text-4xl">
+            Enter item info:
+          </h1>
+          <div class="flex w-full flex-col justify-start gap-2 md:flex-row">
+            <label
+              for="item-url"
+              class="self-center text-xl text-white sm:text-2xl"
               >Item URL:</label
             >
             <input
-              type="text"
+              type="url"
               name="item-url"
               id="in-url"
-              class="flex-grow rounded p-1 sm:text-2xl"
+              class="flex-grow rounded border-2 p-1 outline-none placeholder-shown:!border-black valid:border-green-500 invalid:border-red-500 focus:invalid:border-yellow-500 sm:text-2xl"
               placeholder="Marketplace URL for item"
+              required
+            />
+          </div>
+          <div>
+            <label
+              for="item-quantity"
+              class="self-center text-xl text-white sm:text-2xl"
+              >Quantity bought:
+            </label>
+            <input
+              type="number"
+              name="item-quantity"
+              id="in-quantity"
+              class="w-20 rounded border-2 p-1 outline-none placeholder-shown:!border-black valid:border-green-500 invalid:border-red-500 focus:invalid:border-yellow-500 sm:w-32 sm:text-2xl"
+              placeholder="Quantity"
+              min="0"
+              required
             />
           </div>
           <div class="flex w-full justify-start gap-2">
             <label for="item-cost" class="self-center text-white sm:text-2xl"
-              >Paid:</label
+              >Paid (per item):</label
             >
             <select
               name="currency"
@@ -117,11 +139,14 @@
               <option value="47" disabled>RON</option>
             </select>
             <input
-              type="number"
+              type="text"
               name="item-cost"
               id="in-cost"
-              class="rounded p-1 sm:w-32 sm:text-2xl"
+              class="w-20 rounded border-2 p-1 outline-none placeholder-shown:!border-black valid:border-green-500 invalid:border-red-500 focus:invalid:border-yellow-500 sm:w-32 sm:text-2xl"
               placeholder="Amount"
+              pattern="[0-9.]+"
+              min="0"
+              required
             />
           </div>
           <p class="max-w-[80%] text-xs text-white">
@@ -129,11 +154,11 @@
           </p>
           <button
             type="submit"
-            class="m-4 w-1/2 self-end rounded border-2 p-2 text-white"
+            class="m-4 w-1/2 self-end rounded border-2 p-2 text-white transition-all hover:-translate-y-2 hover:border-cyan-500 hover:duration-300 sm:text-2xl"
           >
             Submit
           </button>
-        </div>
+        </form>
       </div>
     </main>
   </body>
