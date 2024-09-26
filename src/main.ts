@@ -1,5 +1,7 @@
 type UserInvestment = {
   itemURL: string;
+  appID: string;
+  marketHash: string;
   quantity: number;
   currencyCode: number;
   cost: number;
@@ -20,11 +22,25 @@ const saveFormData = (): void => {
 
   const investmentCurrencyCode: number = Number(formCurrencyCode.value);
 
+  //Valid url is: https://steamcommunity.com/market/listings/{appID}/{marketHash}
+  const tempURL = new URL(investmentURL);
+
+  ///market/listings/{appID}/{marketHash}
+  const path: string = tempURL.pathname;
+  //[ '', 'market', 'listings', 'appID', 'marketHash' ]
+  const directories = path.split("/");
+
+  const investmentAppID = directories[3];
+  const investmentMarketHash = directories[4];
+
   //Needs to change commas into decimal points
+  //and remove both from quantity input.
   const investmentCost: number = Number(formCost.value);
 
   const userInfo: UserInvestment = {
     itemURL: investmentURL,
+    appID: investmentAppID,
+    marketHash: investmentMarketHash,
     quantity: investmentQuantity,
     currencyCode: investmentCurrencyCode,
     cost: investmentCost,
@@ -42,6 +58,8 @@ const saveFormData = (): void => {
     localStorage.setItem("investments", JSON.stringify(storedInvestments));
   }
 };
+
+const extractURLData = (): void => {};
 
 const resetForm = () => {
   formURL.value = "";

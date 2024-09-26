@@ -7,10 +7,21 @@ var saveFormData = function () {
     var investmentURL = formURL.value;
     var investmentQuantity = Number(formQuantity.value);
     var investmentCurrencyCode = Number(formCurrencyCode.value);
+    //Valid url is: https://steamcommunity.com/market/listings/{appID}/{marketHash}
+    var tempURL = new URL(investmentURL);
+    ///market/listings/{appID}/{marketHash}
+    var path = tempURL.pathname;
+    //[ '', 'market', 'listings', 'appID', 'marketHash' ]
+    var directories = path.split("/");
+    var investmentAppID = directories[3];
+    var investmentMarketHash = directories[4];
     //Needs to change commas into decimal points
+    //and remove both from quantity input.
     var investmentCost = Number(formCost.value);
     var userInfo = {
         itemURL: investmentURL,
+        appID: investmentAppID,
+        marketHash: investmentMarketHash,
         quantity: investmentQuantity,
         currencyCode: investmentCurrencyCode,
         cost: investmentCost,
@@ -26,6 +37,7 @@ var saveFormData = function () {
         localStorage.setItem("investments", JSON.stringify(storedInvestments));
     }
 };
+var extractURLData = function () { };
 var resetForm = function () {
     formURL.value = "";
     formQuantity.value = "";
