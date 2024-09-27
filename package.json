@@ -1,12 +1,12 @@
 {
-  "name": "colourtrick-remastered",
+  "name": "steaminvest-tracker",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:tailwind": "tailwindcss -i ./src/input.css -o ./public/output.css --watch",
-    "build:typescript": "npx tsc ./src/main.ts --watch"
+    "build:typescript": "npx tsc -p tsconfig.json --watch"
   },
   "keywords": [],
   "author": "",

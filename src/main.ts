@@ -59,7 +59,33 @@ const saveFormData = (): void => {
   }
 };
 
-const extractURLData = (): void => {};
+const fetchAPIData = async () => {
+  const investments: Array<UserInvestment> = JSON.parse(
+    localStorage.getItem("investments")!,
+  );
+  for (let investment of investments) {
+    const apiURL = `https://cors-anywhere.herokuapp.com/https://steamcommunity.com/market/priceoverview/?currency=${investment.currencyCode}&appid=${investment.appID}&market_hash_name=${investment.marketHash}`;
+    try {
+      const response = await fetch(apiURL);
+
+      if (!response.ok) {
+        console.log("Response: " + response);
+        console.log("Response Stringified: " + JSON.stringify(response));
+        throw new Error(`Error fetching market data (${response.status}`);
+      }
+
+      console.log("Response: " + response);
+      console.log("Response Stringified: " + JSON.stringify(response));
+
+      const apiData = await response.json();
+      console.log("Unstringified: " + apiData);
+      console.log("Stringified: " + JSON.stringify(apiData));
+      console.log("Lowest price: " + apiData.lowest_price);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+};
 
 const resetForm = () => {
   formURL.value = "";
@@ -79,8 +105,3 @@ if (form.onsubmit) {
     }
   };
 }
-
-const printFormData = () => {
-  console.log("Unparsed:" + localStorage.getItem("investments"));
-  console.log("Parsed:" + JSON.parse(localStorage.getItem("investments")!));
-};
