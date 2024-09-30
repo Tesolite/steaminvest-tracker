@@ -12,7 +12,7 @@ const saveFormData = () => {
     const tempURL = new URL(investmentURL);
     ///market/listings/{appID}/{marketHash}
     const path = tempURL.pathname;
-    //[ '', 'market', 'listings', 'appID', 'marketHash' ]
+    //[ '', 'market', 'listings', '{appID}', '{marketHash}' ]
     const directories = path.split("/");
     const investmentAppID = directories[3];
     const investmentMarketHash = directories[4];
@@ -41,13 +41,14 @@ const saveFormData = () => {
 const fetchAPIData = async () => {
     const investments = JSON.parse(localStorage.getItem("investments"));
     for (let investment of investments) {
+        //Need to use https://cors-anywhere.herokuapp.com/corsdemo
         const apiURL = `https://cors-anywhere.herokuapp.com/https://steamcommunity.com/market/priceoverview/?currency=${investment.currencyCode}&appid=${investment.appID}&market_hash_name=${investment.marketHash}`;
         try {
             const response = await fetch(apiURL);
             if (!response.ok) {
                 console.log("Response: " + response);
                 console.log("Response Stringified: " + JSON.stringify(response));
-                throw new Error(`Error fetching market data (${response.status}`);
+                throw new Error(`Error fetching market data: (${response.status})`);
             }
             console.log("Response: " + response);
             console.log("Response Stringified: " + JSON.stringify(response));
@@ -55,6 +56,22 @@ const fetchAPIData = async () => {
             console.log("Unstringified: " + apiData);
             console.log("Stringified: " + JSON.stringify(apiData));
             console.log("Lowest price: " + apiData.lowest_price);
+            const investmentData = {
+                quantity: investment.quantity,
+                currencyCode: investment.currencyCode,
+                cost: investment.cost,
+                currentPrice: apiData.lowest_price,
+            };
+            if (localStorage.getItem("processedData") === null) {
+                let processedInvestments = [];
+                processedInvestments.push(investmentData);
+                localStorage.setItem("processedData", JSON.stringify(processedInvestments));
+            }
+            else {
+                let processedInvestments = JSON.parse(localStorage.getItem("processedData"));
+                processedInvestments.push(investmentData);
+                localStorage.setItem("processedData", JSON.stringify(processedInvestments));
+            }
         }
         catch (error) {
             console.error(error);
