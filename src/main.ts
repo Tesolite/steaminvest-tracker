@@ -81,14 +81,9 @@ const fetchAPIData = async () => {
         throw new Error(`Error fetching market data: (${response.status})`);
       }
 
-      console.log("Response: " + response);
-      console.log("Response Stringified: " + JSON.stringify(response));
-
       const apiData = await response.json();
-      console.log("Unstringified: " + apiData);
-      console.log("Stringified: " + JSON.stringify(apiData));
-      console.log("Lowest price: " + apiData.lowest_price);
 
+      console.log("Lowest price: " + apiData.lowest_price);
       const investmentData: investmentInfo = {
         quantity: investment.quantity,
         currencyCode: investment.currencyCode,
