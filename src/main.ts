@@ -8,6 +8,7 @@ type UserInvestment = {
 };
 
 type investmentInfo = {
+  itemName: string;
   quantity: number;
   currencyCode: number;
   cost: number;
@@ -65,6 +66,7 @@ const saveFormData = (): void => {
   }
 };
 
+//Add functionality to prevent duplicates, especially when function is called
 const fetchAPIData = async () => {
   const investments: Array<UserInvestment> = JSON.parse(
     localStorage.getItem("investments")!,
@@ -85,6 +87,7 @@ const fetchAPIData = async () => {
 
       console.log("Lowest price: " + apiData.lowest_price);
       const investmentData: investmentInfo = {
+        itemName: investment.marketHash,
         quantity: investment.quantity,
         currencyCode: investment.currencyCode,
         cost: investment.cost,
@@ -111,6 +114,14 @@ const fetchAPIData = async () => {
     } catch (error) {
       console.error(error);
     }
+  }
+};
+
+const getProcessedData = () => {
+  const storedData: string | null = localStorage.getItem("processedData");
+  if (storedData !== null) {
+    const parsedStoredData: Array<investmentInfo> = JSON.parse(storedData);
+    console.log(JSON.stringify(parsedStoredData));
   }
 };
 

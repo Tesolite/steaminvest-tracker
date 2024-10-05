@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Steam Investment Tracker</title>
+    <link rel="stylesheet" href="../public/output.css" />
+    <script defer src="main.js"></script>
+  </head>
+  <body class="bg-sky-950">
+    <header
+      class="flex flex-col bg-slate-500 bg-opacity-10 px-2 sm:flex-row sm:justify-between"
+    >
+      <a href="index.html" class="min-w-44 max-w-[10%] self-center">
+        <img
+          src="../public/assets/images/logo-placeholder.png"
+          alt="Steam Investment Tracker logo"
+        />
+      </a>
+      <nav class="flex items-center justify-center divide-x py-4 sm:divide-x-0">
+        <a
+          href="index.html"
+          class="mx-2 flex h-[90%] items-center px-4 sm:rounded sm:hover:bg-sky-800"
+          ><span
+            class="text-xl text-white hover:text-blue-400 sm:hover:text-white"
+            >Home</span
+          ></a
+        ><a
+          href="investments.html"
+          class="mx-2 flex h-[90%] items-center px-4 sm:rounded sm:hover:bg-sky-800"
+          ><span
+            class="text-xl text-white hover:text-blue-400 sm:hover:text-white"
+            >My Investments</span
+          ></a
+        >
+      </nav>
+    </header>
+
+    <main>
+      <div
+        id="investment-grid"
+        class="auto m-4 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      >
+        <div
+          id="investment-wrapper"
+          class="flex flex-col border-2 p-2 text-white"
+        >
+          <p class="self-center pb-1">Name</p>
+          <hr class="m-auto w-[90%] py-1 align-middle opacity-50" />
+          <div class="flex flex-row justify-between">
+            <p>Quantity</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>Purchased for</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>Current lowest</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>Gross profit</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>After Steam tax</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>Total after tax</p>
+            <p>X</p>
+          </div>
+        </div>
+        <div class="flex flex-col border-2 p-2 text-white">
+          <p class="self-center pb-1">Name</p>
+          <hr class="m-auto w-[90%] py-1 align-middle opacity-50" />
+          <div class="flex flex-row justify-between">
+            <p>Quantity</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>Purchased for</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>Current lowest</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>Gross profit</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>After Steam tax</p>
+            <p>X</p>
+          </div>
+          <div class="flex flex-row justify-between">
+            <p>Total after tax</p>
+            <p>X</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
