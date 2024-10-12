@@ -7,7 +7,7 @@ type UserInvestment = {
   cost: number;
 };
 
-type investmentInfo = {
+type InvestmentInfo = {
   itemName: string;
   quantity: number;
   currencyCode: number;
@@ -86,7 +86,7 @@ const fetchAPIData = async () => {
       const apiData = await response.json();
 
       console.log("Lowest price: " + apiData.lowest_price);
-      const investmentData: investmentInfo = {
+      const investmentData: InvestmentInfo = {
         itemName: investment.marketHash,
         quantity: investment.quantity,
         currencyCode: investment.currencyCode,
@@ -95,14 +95,14 @@ const fetchAPIData = async () => {
       };
 
       if (localStorage.getItem("processedData") === null) {
-        let processedInvestments: Array<investmentInfo> = [];
+        let processedInvestments: Array<InvestmentInfo> = [];
         processedInvestments.push(investmentData);
         localStorage.setItem(
           "processedData",
           JSON.stringify(processedInvestments),
         );
       } else {
-        let processedInvestments: Array<investmentInfo> = JSON.parse(
+        let processedInvestments: Array<InvestmentInfo> = JSON.parse(
           localStorage.getItem("processedData")!,
         );
         processedInvestments.push(investmentData);
@@ -120,7 +120,7 @@ const fetchAPIData = async () => {
 const getProcessedData = () => {
   const storedData: string | null = localStorage.getItem("processedData");
   if (storedData !== null) {
-    const parsedStoredData: Array<investmentInfo> = JSON.parse(storedData);
+    const parsedStoredData: Array<InvestmentInfo> = JSON.parse(storedData);
     console.log(JSON.stringify(parsedStoredData));
   }
 };
