@@ -89,8 +89,12 @@ const fetchAPIData = async () => {
       //Need to change this so that commas for 1000s are not affected.
       let formattedPrice = apiData.lowest_price.replace(",", ".");
       //Removing currency symbol (since sometimes it's shown in front, sometimes in back).
-      formattedPrice = formattedPrice.replace("[^0-9,.]+/g", "");
-      const currency = apiData.lowest_price.replace("[0-9,.]+/g", "");
+      formattedPrice = formattedPrice.replace(/[^0-9,.]+/g, "");
+      //Convert processed string back into number.
+      formattedPrice = Number(formattedPrice);
+
+      //Extract used currency.
+      const currency = apiData.lowest_price.replace(/[0-9,.]+/g, "");
 
       console.log("Lowest price: " + apiData.lowest_price);
       console.log("Currency: " + currency);
@@ -134,14 +138,17 @@ const getProcessedData = () => {
   }
 };
 
-const displayInvestments = () => {
+const displayInvestments = async () => {
+  //Update storage with up-to-date data.
+  localStorage.removeItem("processedData");
+  await fetchAPIData();
+
   const storedData: string | null = localStorage.getItem("processedData");
   if (storedData !== null) {
     const parsedStoredData: Array<InvestmentInfo> = JSON.parse(storedData);
     let counter: number = 0;
     const grid = document.getElementById("investment-grid");
     for (let datum of parsedStoredData) {
-      //Remove "as" and question marks here when home.
       let clone = document
         .getElementById("investment-wrapper")
         ?.cloneNode(true) as HTMLDivElement;
@@ -152,7 +159,11 @@ const displayInvestments = () => {
         `quantity-field of ${clone.id} is: ` +
           clone.querySelector(".quantity-field"),
       );
-      //Need to create a hashmap for currency-value pairs
+      const nameField: HTMLParagraphElement | null =
+        currentInvestment.querySelector(".name-field");
+      if (nameField) {
+        nameField.textContent = decodeURI(datum.itemName);
+      }
       const quantityField: HTMLParagraphElement | null =
         currentInvestment.querySelector(".quantity-field");
       console.warn("quantityField is: " + quantityField);
@@ -166,12 +177,13 @@ const displayInvestments = () => {
       const costField: HTMLParagraphElement | null =
         currentInvestment.querySelector(".cost-field");
       if (costField) {
-        costField.textContent = datum.cost.toString();
+        costField.textContent = datum.currencySymbol + datum.cost.toFixed(2);
       }
       const priceField: HTMLParagraphElement | null =
         currentInvestment.querySelector(".price-field");
       if (priceField) {
-        priceField.textContent = datum.currentPrice.toString();
+        priceField.textContent =
+          datum.currencySymbol + datum.currentPrice.toFixed(2);
       }
       const profitField: HTMLParagraphElement | null =
         currentInvestment.querySelector(".profit-field");
@@ -180,26 +192,20 @@ const displayInvestments = () => {
         datum.currentPrice + " - " + datum.cost + " = " + profitCalculation,
       );
       if (profitField) {
-        profitField.textContent = profitCalculation.toString();
+        profitField.textContent =
+          datum.currencySymbol + profitCalculation.toFixed(2);
       }
 
       const totalField: HTMLParagraphElement | null =
         currentInvestment.querySelector(".total-field");
       const totalProfit: number = profitCalculation * datum.quantity;
       if (totalField) {
-        totalField.textContent = totalProfit.toString();
+        totalField.textContent = datum.currencySymbol + totalProfit.toFixed(2);
       }
 
       if (grid) {
         grid.appendChild(clone);
       }
-
-      //Clone template node
-      //Give node unique ID
-      //Apply 1 set of data to the node
-      //Append node to the grid container
-
-      //document.getElementById("investment-grid").appendChild(document.getElementById("investment-wrapper").cloneNode(true));
       counter++;
     }
   }
