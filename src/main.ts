@@ -11,6 +11,7 @@ type InvestmentInfo = {
   itemName: string;
   quantity: number;
   currencyCode: number;
+  currencySymbol: string;
   cost: number;
   currentPrice: number;
 };
@@ -85,13 +86,21 @@ const fetchAPIData = async () => {
 
       const apiData = await response.json();
 
+      //Need to change this so that commas for 1000s are not affected.
+      let formattedPrice = apiData.lowest_price.replace(",", ".");
+      //Removing currency symbol (since sometimes it's shown in front, sometimes in back).
+      formattedPrice = formattedPrice.replace("[^0-9,.]+/g", "");
+      const currency = apiData.lowest_price.replace("[0-9,.]+/g", "");
+
       console.log("Lowest price: " + apiData.lowest_price);
+      console.log("Currency: " + currency);
       const investmentData: InvestmentInfo = {
         itemName: investment.marketHash,
         quantity: investment.quantity,
         currencyCode: investment.currencyCode,
+        currencySymbol: currency,
         cost: investment.cost,
-        currentPrice: apiData.lowest_price,
+        currentPrice: formattedPrice,
       };
 
       if (localStorage.getItem("processedData") === null) {
@@ -125,13 +134,84 @@ const getProcessedData = () => {
   }
 };
 
+const displayInvestments = () => {
+  const storedData: string | null = localStorage.getItem("processedData");
+  if (storedData !== null) {
+    const parsedStoredData: Array<InvestmentInfo> = JSON.parse(storedData);
+    let counter: number = 0;
+    const grid = document.getElementById("investment-grid");
+    for (let datum of parsedStoredData) {
+      //Remove "as" and question marks here when home.
+      let clone = document
+        .getElementById("investment-wrapper")
+        ?.cloneNode(true) as HTMLDivElement;
+      clone.id = `investment-${counter}`;
+      const currentInvestment = clone;
+
+      console.warn(
+        `quantity-field of ${clone.id} is: ` +
+          clone.querySelector(".quantity-field"),
+      );
+      //Need to create a hashmap for currency-value pairs
+      const quantityField: HTMLParagraphElement | null =
+        currentInvestment.querySelector(".quantity-field");
+      console.warn("quantityField is: " + quantityField);
+      if (!quantityField) {
+        console.error("quantity-field is null.");
+      }
+      if (quantityField) {
+        console.log("quantity-field is not null!");
+        quantityField.textContent = datum.quantity.toString();
+      }
+      const costField: HTMLParagraphElement | null =
+        currentInvestment.querySelector(".cost-field");
+      if (costField) {
+        costField.textContent = datum.cost.toString();
+      }
+      const priceField: HTMLParagraphElement | null =
+        currentInvestment.querySelector(".price-field");
+      if (priceField) {
+        priceField.textContent = datum.currentPrice.toString();
+      }
+      const profitField: HTMLParagraphElement | null =
+        currentInvestment.querySelector(".profit-field");
+      const profitCalculation: number = datum.currentPrice - datum.cost;
+      console.log(
+        datum.currentPrice + " - " + datum.cost + " = " + profitCalculation,
+      );
+      if (profitField) {
+        profitField.textContent = profitCalculation.toString();
+      }
+
+      const totalField: HTMLParagraphElement | null =
+        currentInvestment.querySelector(".total-field");
+      const totalProfit: number = profitCalculation * datum.quantity;
+      if (totalField) {
+        totalField.textContent = totalProfit.toString();
+      }
+
+      if (grid) {
+        grid.appendChild(clone);
+      }
+
+      //Clone template node
+      //Give node unique ID
+      //Apply 1 set of data to the node
+      //Append node to the grid container
+
+      //document.getElementById("investment-grid").appendChild(document.getElementById("investment-wrapper").cloneNode(true));
+      counter++;
+    }
+  }
+};
+
 const resetForm = () => {
   formURL.value = "";
   formQuantity.value = "";
   formCost.value = "";
 };
 
-if (form.onsubmit) {
+if (form) {
   form.onsubmit = (event) => {
     event.preventDefault();
     if (form.checkValidity()) {
@@ -142,4 +222,6 @@ if (form.onsubmit) {
       form.reportValidity();
     }
   };
+} else {
+  console.log("No form found.");
 }
