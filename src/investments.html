@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../public/output.css" />
     <script defer src="main.js"></script>
   </head>
-  <body class="bg-sky-950">
+  <body onload="displayInvestments()" class="bg-sky-950">
     <header
       class="flex flex-col bg-slate-500 bg-opacity-10 px-2 sm:flex-row sm:justify-between"
     >
@@ -43,7 +43,7 @@
       >
         <div
           id="investment-wrapper"
-          class="flex flex-col border-2 p-2 text-white"
+          class="hidden flex-col border-2 p-2 text-white"
         >
           <p class="name-field self-center pb-1">Name</p>
           <hr class="m-auto w-[90%] py-1 align-middle opacity-50" />

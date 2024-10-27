@@ -36,10 +36,10 @@ const saveFormData = (): void => {
   ///market/listings/{appID}/{marketHash}
   const path: string = tempURL.pathname;
   //[ '', 'market', 'listings', '{appID}', '{marketHash}' ]
-  const directories = path.split("/");
+  const directories: string[] = path.split("/");
 
-  const investmentAppID = directories[3];
-  const investmentMarketHash = directories[4];
+  const investmentAppID: string = directories[3];
+  const investmentMarketHash: string = directories[4];
 
   //Needs to change commas into decimal points
   //and remove both from quantity input.
@@ -67,7 +67,7 @@ const saveFormData = (): void => {
   }
 };
 
-//Add functionality to prevent duplicates, especially when function is called
+//Handle error with grabbing api data. probably do alert box alerting users to cors anywhere.
 const fetchAPIData = async () => {
   const investments: Array<UserInvestment> = JSON.parse(
     localStorage.getItem("investments")!,
@@ -138,6 +138,7 @@ const getProcessedData = () => {
   }
 };
 
+//Handle function when there are no investments to display.
 const displayInvestments = async () => {
   //Update storage with up-to-date data.
   localStorage.removeItem("processedData");
@@ -192,16 +193,42 @@ const displayInvestments = async () => {
         datum.currentPrice + " - " + datum.cost + " = " + profitCalculation,
       );
       if (profitField) {
-        profitField.textContent =
-          datum.currencySymbol + profitCalculation.toFixed(2);
+        if (profitCalculation < 0) {
+          profitField.classList.add("text-red-500");
+
+          //Fixing minus sign position for proper syntax with currency symbol
+          profitField.textContent =
+            "-" + datum.currencySymbol + Math.abs(profitCalculation).toFixed(2);
+        } else if (profitCalculation > 0) {
+          profitField.textContent =
+            datum.currencySymbol + profitCalculation.toFixed(2);
+          profitField.classList.add("text-green-500");
+        } else {
+          profitField.textContent =
+            datum.currencySymbol + profitCalculation.toFixed(2);
+        }
       }
 
       const totalField: HTMLParagraphElement | null =
         currentInvestment.querySelector(".total-field");
       const totalProfit: number = profitCalculation * datum.quantity;
       if (totalField) {
-        totalField.textContent = datum.currencySymbol + totalProfit.toFixed(2);
+        if (profitCalculation < 0) {
+          totalField.classList.add("text-red-500");
+          totalField.textContent =
+            "-" + datum.currencySymbol + Math.abs(profitCalculation).toFixed(2);
+        } else if (profitCalculation > 0) {
+          totalField.classList.add("text-green-500");
+          totalField.textContent =
+            datum.currencySymbol + profitCalculation.toFixed(2);
+        } else {
+          totalField.textContent =
+            datum.currencySymbol + profitCalculation.toFixed(2);
+        }
       }
+      //Too many requests error right now. Check if works later.
+      clone.classList.remove("hidden");
+      clone.classList.add("flex");
 
       if (grid) {
         grid.appendChild(clone);
