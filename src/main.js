@@ -52,12 +52,12 @@ const fetchAPIData = async () => {
                 throw new Error(`Error fetching market data: (${response.status})`);
             }
             const apiData = await response.json();
-            //Need to change this so that commas for 1000s are not affected.
-            let formattedPrice = apiData.lowest_price.replace(",", ".");
-            //Removing currency symbol (since sometimes it's shown in front, sometimes in back).
-            formattedPrice = formattedPrice.replace(/[^0-9,.]+/g, "");
-            //Convert processed string back into number.
-            formattedPrice = Number(formattedPrice);
+            //Removing currency symbol (since sometimes it's shown in front, sometimes in back) and decimals/commas.
+            let numbersOnly = apiData.lowest_price.replace(/[^0-9]+/g, "");
+            //Add decimal back to number
+            let addedDecimal = numbersOnly.slice(0, -2) + "." + numbersOnly.slice(-2);
+            //Convert processed string back into number
+            let formattedPrice = Number(addedDecimal);
             //Extract used currency.
             const currency = apiData.lowest_price.replace(/[0-9,.]+/g, "");
             console.log("Lowest price: " + apiData.lowest_price);
@@ -130,45 +130,64 @@ const displayInvestments = async () => {
             }
             const priceField = currentInvestment.querySelector(".price-field");
             if (priceField) {
-                priceField.textContent =
-                    datum.currencySymbol + datum.currentPrice.toFixed(2);
+                if (datum.currentPrice === null) {
+                    priceField.textContent = "UNAVAILABLE";
+                }
+                else {
+                    priceField.textContent =
+                        datum.currencySymbol + datum.currentPrice.toFixed(2);
+                }
             }
             const profitField = currentInvestment.querySelector(".profit-field");
             const profitCalculation = datum.currentPrice - datum.cost;
             console.log(datum.currentPrice + " - " + datum.cost + " = " + profitCalculation);
             if (profitField) {
-                if (profitCalculation < 0) {
-                    profitField.classList.add("text-red-500");
-                    //Fixing minus sign position for proper syntax with currency symbol
-                    profitField.textContent =
-                        "-" + datum.currencySymbol + Math.abs(profitCalculation).toFixed(2);
-                }
-                else if (profitCalculation > 0) {
-                    profitField.textContent =
-                        datum.currencySymbol + profitCalculation.toFixed(2);
-                    profitField.classList.add("text-green-500");
+                if (datum.currentPrice === null) {
+                    profitField.textContent = "N/A";
                 }
                 else {
-                    profitField.textContent =
-                        datum.currencySymbol + profitCalculation.toFixed(2);
+                    if (profitCalculation < 0) {
+                        profitField.classList.add("text-red-500");
+                        //Fixing minus sign position for proper syntax with currency symbol
+                        profitField.textContent =
+                            "-" +
+                                datum.currencySymbol +
+                                Math.abs(profitCalculation).toFixed(2);
+                    }
+                    else if (profitCalculation > 0) {
+                        profitField.textContent =
+                            datum.currencySymbol + profitCalculation.toFixed(2);
+                        profitField.classList.add("text-green-500");
+                    }
+                    else {
+                        profitField.textContent =
+                            datum.currencySymbol + profitCalculation.toFixed(2);
+                    }
                 }
             }
             const totalField = currentInvestment.querySelector(".total-field");
             const totalProfit = profitCalculation * datum.quantity;
             if (totalField) {
-                if (profitCalculation < 0) {
-                    totalField.classList.add("text-red-500");
-                    totalField.textContent =
-                        "-" + datum.currencySymbol + Math.abs(profitCalculation).toFixed(2);
-                }
-                else if (profitCalculation > 0) {
-                    totalField.classList.add("text-green-500");
-                    totalField.textContent =
-                        datum.currencySymbol + profitCalculation.toFixed(2);
+                if (datum.currentPrice === null) {
+                    totalField.textContent = "N/A";
                 }
                 else {
-                    totalField.textContent =
-                        datum.currencySymbol + profitCalculation.toFixed(2);
+                    if (profitCalculation < 0) {
+                        totalField.classList.add("text-red-500");
+                        totalField.textContent =
+                            "-" +
+                                datum.currencySymbol +
+                                Math.abs(profitCalculation).toFixed(2);
+                    }
+                    else if (profitCalculation > 0) {
+                        totalField.classList.add("text-green-500");
+                        totalField.textContent =
+                            datum.currencySymbol + profitCalculation.toFixed(2);
+                    }
+                    else {
+                        totalField.textContent =
+                            datum.currencySymbol + profitCalculation.toFixed(2);
+                    }
                 }
             }
             //Too many requests error right now. Check if works later.
