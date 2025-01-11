@@ -256,17 +256,53 @@ const displayInvestments = async () => {
   }
 };
 
+const preventDecimal = (inputField: HTMLInputElement): void => {
+  let decimalCount: number = (inputField.value.match(/\./g) || []).length;
+  if (decimalCount > 0) {
+    inputField.value = inputField.value.slice(0, -1);
+  }
+};
+
+const quantityInput: HTMLInputElement = document.getElementById(
+  "in-quantity",
+) as HTMLInputElement;
+
+if (quantityInput) {
+  quantityInput.addEventListener("input", (event) => {
+    preventDecimal(event.target as HTMLInputElement);
+  });
+}
+
 const formatCurrencyInput = (inputField: HTMLInputElement): void => {
+  //Normalise decimal point syntax
   if (inputField.value) {
     if (inputField.value.indexOf(",") != -1) {
       inputField.value = inputField.value.replace(",", ".");
     }
+
+    //Prevent more than one decimal point
+    let decimalCount: number = (inputField.value.match(/\./g) || []).length;
+    if (decimalCount > 1) {
+      inputField.value = inputField.value.slice(0, -1);
+    }
+
+    //Limit numbers to 2 d.p. to encourage matching standard currency format
     inputField.value =
       inputField.value.indexOf(".") >= 0
         ? inputField.value.slice(0, inputField.value.indexOf(".") + 3)
         : inputField.value;
   }
 };
+
+const costInput: HTMLInputElement = document.getElementById(
+  "in-cost",
+) as HTMLInputElement;
+
+if (costInput) {
+  costInput.addEventListener("input", (event) => {
+    formatCurrencyInput(event.target as HTMLInputElement);
+  });
+}
 
 const resetForm = () => {
   formURL.value = "";

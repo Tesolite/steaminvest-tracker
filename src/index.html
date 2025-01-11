@@ -83,6 +83,7 @@
               class="w-20 rounded border-2 p-1 outline-none placeholder-shown:!border-black valid:border-green-500 invalid:border-red-500 focus:invalid:border-yellow-500 sm:w-32 sm:text-2xl"
               placeholder="Quantity"
               min="0"
+              step="1"
               required
             />
           </div>
@@ -144,7 +145,7 @@
               <option value="46" disabled>HUF</option>
               <option value="47" disabled>RON</option>
             </select>
-            
+
             <input
               type="text"
               inputmode="decimal"
@@ -152,8 +153,6 @@
               id="in-cost"
               class="w-20 rounded border-2 p-1 outline-none placeholder-shown:!border-black valid:border-green-500 invalid:border-red-500 focus:invalid:border-yellow-500 sm:w-32 sm:text-2xl"
               placeholder="Amount"
-              onkeydown="formatCurrencyInput(this);"
-              onkeyup="formatCurrencyInput(this);"
               pattern="[0-9]+([,.][0-9]{1,2})?"
               min="0"
               required

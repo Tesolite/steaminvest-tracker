@@ -200,17 +200,42 @@ const displayInvestments = async () => {
         }
     }
 };
+const preventDecimal = (inputField) => {
+    let decimalCount = (inputField.value.match(/\./g) || []).length;
+    if (decimalCount > 0) {
+        inputField.value = inputField.value.slice(0, -1);
+    }
+};
+const quantityInput = document.getElementById("in-quantity");
+if (quantityInput) {
+    quantityInput.addEventListener("input", (event) => {
+        preventDecimal(event.target);
+    });
+}
 const formatCurrencyInput = (inputField) => {
+    //Normalise decimal point syntax
     if (inputField.value) {
         if (inputField.value.indexOf(",") != -1) {
             inputField.value = inputField.value.replace(",", ".");
         }
+        //Prevent more than one decimal point
+        let decimalCount = (inputField.value.match(/\./g) || []).length;
+        if (decimalCount > 1) {
+            inputField.value = inputField.value.slice(0, -1);
+        }
+        //Limit numbers to 2 d.p. to encourage matching standard currency format
         inputField.value =
             inputField.value.indexOf(".") >= 0
                 ? inputField.value.slice(0, inputField.value.indexOf(".") + 3)
                 : inputField.value;
     }
 };
+const costInput = document.getElementById("in-cost");
+if (costInput) {
+    costInput.addEventListener("input", (event) => {
+        formatCurrencyInput(event.target);
+    });
+}
 const resetForm = () => {
     formURL.value = "";
     formQuantity.value = "";
