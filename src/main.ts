@@ -256,6 +256,18 @@ const displayInvestments = async () => {
   }
 };
 
+const formatCurrencyInput = (inputField: HTMLInputElement): void => {
+  if (inputField.value) {
+    if (inputField.value.indexOf(",") != -1) {
+      inputField.value = inputField.value.replace(",", ".");
+    }
+    inputField.value =
+      inputField.value.indexOf(".") >= 0
+        ? inputField.value.slice(0, inputField.value.indexOf(".") + 3)
+        : inputField.value;
+  }
+};
+
 const resetForm = () => {
   formURL.value = "";
   formQuantity.value = "";

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Steam Investment Tracker</title>
     <link rel="stylesheet" href="../public/output.css" />
-    <script defer src="main.js"></script>
+    <script defer src="/src/main.js"></script>
   </head>
   <body class="bg-sky-950">
     <header
@@ -45,8 +45,7 @@
         />
         <form
           id="investment-form"
-          action=""
-          onsubmit="printFormData();"
+          onsubmit="printFormData(); saveFormData();"
           class="flex flex-col items-start justify-center gap-4 rounded border-2 border-white border-opacity-65 bg-teal-950 p-2 sm:w-[60%]"
         >
           <h1 class="text-2xl text-white sm:pb-4 sm:text-4xl">
@@ -60,9 +59,10 @@
             >
             <input
               type="url"
+              inputmode="url"
               name="item-url"
               id="in-url"
-              pattern="https://steamcommunity.com/market/listings/[0-9]+/[^\/]+/?"
+              pattern="https://steamcommunity.com/market/listings/[0-9]+/.+"
               class="flex-grow rounded border-2 p-1 outline-none placeholder-shown:!border-black valid:border-green-500 invalid:border-red-500 focus:invalid:border-yellow-500 sm:text-2xl"
               placeholder="Marketplace URL for item"
               required
@@ -76,6 +76,7 @@
             </label>
             <input
               type="number"
+              inputmode="numeric"
               name="item-quantity"
               pattern="[0-9]+"
               id="in-quantity"
@@ -143,14 +144,16 @@
               <option value="46" disabled>HUF</option>
               <option value="47" disabled>RON</option>
             </select>
+            
             <input
               type="text"
+              inputmode="decimal"
               name="item-cost"
               id="in-cost"
               class="w-20 rounded border-2 p-1 outline-none placeholder-shown:!border-black valid:border-green-500 invalid:border-red-500 focus:invalid:border-yellow-500 sm:w-32 sm:text-2xl"
               placeholder="Amount"
-              <!-- TODO: ROUND UP TO NEAREST 2 DP WHEN USERS ATTEMPT TO TYPE MORE THAN 2 NUMBERS AFTER DP AND PREVENT INPUT UNTIL DELETION. -->
-              <!-- ALSO CONVERT COMMAS TO DECIMALS -->
+              onkeydown="formatCurrencyInput(this);"
+              onkeyup="formatCurrencyInput(this);"
               pattern="[0-9]+([,.][0-9]{1,2})?"
               min="0"
               required
@@ -161,7 +164,6 @@
           </p>
           <button
             type="submit"
-            onsubmit="saveFormData();"
             class="m-4 w-1/2 self-end rounded border-2 p-2 text-white transition-all hover:-translate-y-2 hover:border-cyan-500 hover:duration-300 sm:text-2xl"
           >
             Submit
