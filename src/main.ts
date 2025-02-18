@@ -1,3 +1,9 @@
+/* 
+TODO: 
+FOOTER DIRECTING USERS TO CORS-DEMO
+POPUP IF API FAILS TO LOAD DATA
+ */
+
 type UserInvestment = {
   itemURL: string;
   appID: string;
@@ -11,9 +17,9 @@ type InvestmentInfo = {
   itemName: string;
   quantity: number;
   currencyCode: number;
-  currencySymbol: string;
+  currencySymbol?: string;
   cost: number;
-  currentPrice: number;
+  currentPrice: number | null;
 };
 const form = document.getElementById("investment-form") as HTMLFormElement;
 const formURL = document.getElementById("in-url") as HTMLInputElement;
@@ -86,17 +92,25 @@ const fetchAPIData = async () => {
 
       const apiData = await response.json();
 
-      //Removing currency symbol (since sometimes it's shown in front, sometimes in back) and decimals/commas.
-      let numbersOnly: string = apiData.lowest_price.replace(/[^0-9]+/g, "");
+      let formattedPrice: number | null = 0;
+      let currency: string = "";
+      //Testing to see if this will allow non-existing market listings to be shown
+      if (apiData.lowest_price === undefined) {
+        apiData.lowest_price = null;
+        formattedPrice = null;
+      } else {
+        //Removing currency symbol (since sometimes it's shown in front, sometimes in back) and decimals/commas.
+        let numbersOnly: string = apiData.lowest_price.replace(/[^0-9]+/g, "");
 
-      //Add decimal back to number
-      let addedDecimal: string =
-        numbersOnly.slice(0, -2) + "." + numbersOnly.slice(-2);
-      //Convert processed string back into number
-      let formattedPrice: number = Number(addedDecimal);
+        //Add decimal back to number
+        let addedDecimal: string =
+          numbersOnly.slice(0, -2) + "." + numbersOnly.slice(-2);
+        //Convert processed string back into number
+        formattedPrice = Number(addedDecimal);
 
-      //Extract used currency.
-      const currency = apiData.lowest_price.replace(/[0-9,.]+/g, "");
+        //Extract used currency.
+        currency = apiData.lowest_price.replace(/[0-9,.]+/g, "");
+      }
 
       console.log("Lowest price: " + apiData.lowest_price);
       console.log("Currency: " + currency);
@@ -194,7 +208,12 @@ const displayInvestments = async () => {
       }
       const profitField: HTMLParagraphElement | null =
         currentInvestment.querySelector(".profit-field");
-      const profitCalculation: number = datum.currentPrice - datum.cost;
+      let profitCalculation: number | null;
+      if (datum.currentPrice != null) {
+        profitCalculation = datum.currentPrice - datum.cost;
+      } else {
+        profitCalculation = null;
+      }
       console.log(
         datum.currentPrice + " - " + datum.cost + " = " + profitCalculation,
       );
@@ -202,45 +221,60 @@ const displayInvestments = async () => {
         if (datum.currentPrice === null) {
           profitField.textContent = "N/A";
         } else {
-          if (profitCalculation < 0) {
-            profitField.classList.add("text-red-500");
+          if (profitCalculation) {
+            if (profitCalculation < 0) {
+              profitField.classList.add("text-red-500");
 
-            //Fixing minus sign position for proper syntax with currency symbol
-            profitField.textContent =
-              "-" +
-              datum.currencySymbol +
-              Math.abs(profitCalculation).toFixed(2);
-          } else if (profitCalculation > 0) {
-            profitField.textContent =
-              datum.currencySymbol + profitCalculation.toFixed(2);
-            profitField.classList.add("text-green-500");
+              //Fixing minus sign position for proper syntax with currency symbol
+              profitField.textContent =
+                "-" +
+                datum.currencySymbol +
+                Math.abs(profitCalculation).toFixed(2);
+            } else if (profitCalculation > 0) {
+              profitField.textContent =
+                datum.currencySymbol + profitCalculation.toFixed(2);
+              profitField.classList.add("text-green-500");
+            } else {
+              profitField.textContent =
+                datum.currencySymbol + profitCalculation.toFixed(2);
+            }
           } else {
-            profitField.textContent =
-              datum.currencySymbol + profitCalculation.toFixed(2);
+            profitField.textContent = "N/A";
           }
         }
       }
 
       const totalField: HTMLParagraphElement | null =
         currentInvestment.querySelector(".total-field");
-      const totalProfit: number = profitCalculation * datum.quantity;
+      let totalProfit: number | null;
+      if (profitCalculation) {
+        totalProfit = profitCalculation * datum.quantity;
+      } else {
+        totalProfit = null;
+      }
       if (totalField) {
         if (datum.currentPrice === null) {
           totalField.textContent = "N/A";
         } else {
-          if (profitCalculation < 0) {
-            totalField.classList.add("text-red-500");
-            totalField.textContent =
-              "-" +
-              datum.currencySymbol +
-              Math.abs(profitCalculation).toFixed(2);
-          } else if (profitCalculation > 0) {
-            totalField.classList.add("text-green-500");
-            totalField.textContent =
-              datum.currencySymbol + profitCalculation.toFixed(2);
+          if (profitCalculation) {
+            if (profitCalculation < 0) {
+              totalField.classList.add("text-red-500");
+              totalField.textContent =
+                "-" +
+                datum.currencySymbol +
+                Math.abs(profitCalculation * datum.quantity).toFixed(2);
+            } else if (profitCalculation > 0) {
+              totalField.classList.add("text-green-500");
+              totalField.textContent =
+                datum.currencySymbol +
+                Math.abs(profitCalculation * datum.quantity).toFixed(2);
+            } else {
+              totalField.textContent =
+                datum.currencySymbol +
+                Math.abs(profitCalculation * datum.quantity).toFixed(2);
+            }
           } else {
-            totalField.textContent =
-              datum.currencySymbol + profitCalculation.toFixed(2);
+            totalField.textContent = "N/A";
           }
         }
       }
@@ -257,10 +291,13 @@ const displayInvestments = async () => {
 };
 
 const preventDecimal = (inputField: HTMLInputElement): void => {
-  let decimalCount: number = (inputField.value.match(/\./g) || []).length;
-  if (decimalCount > 0) {
-    inputField.value = inputField.value.slice(0, -1);
+  if (inputField.value.indexOf(".") != -1) {
+    inputField.value = inputField.value.replace(".", "");
   }
+};
+
+const preventNonNumber = (inputField: HTMLInputElement): void => {
+  inputField.value = inputField.value.replace(/[^0-9]/g, "");
 };
 
 const quantityInput: HTMLInputElement = document.getElementById(
@@ -269,13 +306,17 @@ const quantityInput: HTMLInputElement = document.getElementById(
 
 if (quantityInput) {
   quantityInput.addEventListener("input", (event) => {
-    preventDecimal(event.target as HTMLInputElement);
+    preventNonNumber(event.target as HTMLInputElement);
   });
 }
 
 const formatCurrencyInput = (inputField: HTMLInputElement): void => {
   //Normalise decimal point syntax
   if (inputField.value) {
+    //Prevent any non-decimal symbols
+    inputField.value = inputField.value.replace(/[^0-9.,]/g, "");
+
+    //Standardise decimal point display
     if (inputField.value.indexOf(",") != -1) {
       inputField.value = inputField.value.replace(",", ".");
     }
