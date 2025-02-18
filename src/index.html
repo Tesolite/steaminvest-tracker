@@ -11,25 +11,27 @@
     <header
       class="flex flex-col bg-slate-500 bg-opacity-10 px-2 sm:flex-row sm:justify-between"
     >
-      <a href="index.html" class="min-w-44 max-w-[10%] self-center">
+      <a href="index.html" class="min-w-44 max-w-[10%] self-center py-4">
         <img
-          src="../public/assets/images/logo-placeholder.png"
+          src="../public/assets/images/logo.png"
           alt="Steam Investment Tracker logo"
         />
       </a>
-      <nav class="flex items-center justify-center divide-x py-4 sm:divide-x-0">
+      <nav
+        class="flex items-center justify-center divide-x pb-2 sm:divide-x-0 sm:pb-0"
+      >
         <a
           href="index.html"
-          class="mx-2 flex h-[90%] items-center px-4 sm:rounded sm:hover:bg-sky-800"
+          class="mx-2 flex h-[75%] items-center p-4 sm:rounded sm:hover:bg-sky-800 sm:active:bg-sky-600"
           ><span
-            class="text-xl text-white hover:text-blue-400 sm:hover:text-white"
+            class="text-xl text-white active:text-blue-400 sm:active:text-white"
             >Home</span
           ></a
         ><a
           href="investments.html"
-          class="mx-2 flex h-[90%] items-center px-4 sm:rounded sm:hover:bg-sky-800"
+          class="mx-2 flex h-[75%] items-center p-4 sm:rounded sm:hover:bg-sky-800 sm:active:bg-sky-600"
           ><span
-            class="text-xl text-white hover:text-blue-400 sm:hover:text-white"
+            class="text-xl text-white active:text-blue-400 sm:active:text-white"
             >My Investments</span
           ></a
         >
@@ -38,6 +40,18 @@
 
     <main>
       <div class="flex flex-col items-center justify-center px-2">
+        <p class="mt-2 text-white">
+          <span class="text-red-600">IMPORTANT:</span>
+          Please request temporary access to the
+          <a
+            class="text-cyan-500 transition-all hover:underline active:text-cyan-300"
+            href="https://cors-anywhere.herokuapp.com/corsdemo"
+            target="_blank"
+            rel="noreferrer noopener"
+            >CORS Anywhere</a
+          >
+          proxy to access the steam API and load the current investment prices
+        </p>
         <img
           src="../public/assets/images/to-the-moon.png"
           alt="image of stocks going up between earth and the moon, with text 'to the moon'"
@@ -163,7 +177,7 @@
           </p>
           <button
             type="submit"
-            class="m-4 w-1/2 self-end rounded border-2 p-2 text-white transition-all hover:-translate-y-2 hover:border-cyan-500 hover:duration-300 sm:text-2xl"
+            class="m-4 w-1/2 self-end rounded border-2 p-2 text-white transition-transform hover:-translate-y-2 hover:border-cyan-500 hover:duration-300 active:border-cyan-300 sm:text-2xl"
           >
             Submit
           </button>
