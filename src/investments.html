@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../public/output.css" />
     <script defer src="main.js"></script>
   </head>
-  <body onload="displayInvestments()" class="bg-sky-950">
+  <body class="bg-sky-950">
     <header
       class="flex flex-col bg-slate-500 bg-opacity-10 px-2 sm:flex-row sm:justify-between"
     >
@@ -38,7 +38,7 @@
       </nav>
     </header>
 
-    <main>
+    <main id="investments-main" class="relative">
       <div class="mt-2 flex items-center justify-center">
         <p class="text-white">
           <span class="text-red-600">IMPORTANT:</span>
@@ -84,6 +84,32 @@
             <p>Total profit</p>
             <p class="total-field">X</p>
           </div>
+        </div>
+      </div>
+      <div
+        id="status-toast-space"
+        class="absolute left-0 right-0 top-0 z-10 mx-auto w-[75%] sm:w-[50%] lg:w-[35%]"
+      >
+        <div
+          id="status-toast"
+          class="m-1 hidden w-full items-center justify-between rounded-md bg-gray-700 text-white opacity-0 transition-all"
+        >
+          <div class="flex max-w-[80%] items-center sm:max-w-none">
+            <img
+              src="../public/assets/images/error-icon.svg"
+              alt="Error icon"
+              class="m-2 inline rounded bg-red-500 p-1"
+            />
+            <span id="status-message" class=""
+              >Lorem ipsum dolor sit amet.</span
+            >
+          </div>
+          <button class="btn-close-toast mr-2">
+            <img
+              src="../public/assets/images/close-icon.svg"
+              alt="Close icon"
+            />
+          </button>
         </div>
       </div>
     </main>

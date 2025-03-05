@@ -1,28 +1,77 @@
 "use strict";
-/*
-TODO:
-POPUP IF API FAILS TO LOAD DATA
- */
+//enum containing all popup categories
+var ToastCategory;
+(function (ToastCategory) {
+    ToastCategory[ToastCategory["FormSubmitSuccess"] = 0] = "FormSubmitSuccess";
+    ToastCategory[ToastCategory["APIRequestStatus"] = 1] = "APIRequestStatus";
+})(ToastCategory || (ToastCategory = {}));
+//Variables for form and form input fields
 const form = document.getElementById("investment-form");
 const formURL = document.getElementById("in-url");
 const formQuantity = document.getElementById("in-quantity");
 const formCurrencyCode = document.getElementById("in-currency");
 const formCost = document.getElementById("in-cost");
+//Toast close button
+const btnCloseToast = document.querySelector(".btn-close-toast");
+//Event listened for toat close button
+btnCloseToast.addEventListener("click", () => {
+    hideToast(btnCloseToast);
+});
+//Function for displaying toast notifications based on popup type and status code(if applicable)
+const displayToast = (notificationType, statusCode) => {
+    //Form submission notification handling
+    if (notificationType === ToastCategory.FormSubmitSuccess) {
+        const formToastWindow = document.getElementById("form-toast");
+        const toastText = document.getElementById("form-message");
+        toastText.textContent = "Form submitted successfully!";
+        formToastWindow.classList.replace("hidden", "flex");
+        //Timeout to let transition-all tailwind class smoothly animate popup
+        setTimeout(() => {
+            formToastWindow.classList.replace("opacity-0", "opacity-100");
+        }, 10);
+        //API error status code notification handling
+    }
+    else if (notificationType === ToastCategory.APIRequestStatus) {
+        const statusToastWindow = document.getElementById("status-toast");
+        const toastText = document.getElementById("status-message");
+        if (statusCode === 403) {
+            toastText.textContent =
+                "Error 403: Did you enable the CORS Anywhere proxy?";
+        }
+        else if (statusCode === 429) {
+            toastText.textContent = "Error 429: Too many requests. Come back later.";
+        }
+        statusToastWindow.classList.replace("hidden", "flex");
+        setTimeout(() => {
+            statusToastWindow.classList.replace("opacity-0", "opacity-100");
+        }, 10);
+    }
+};
+//Function for dismissing toast notification
+const hideToast = (toastExit) => {
+    //Get parent containing exit button
+    const toast = toastExit.parentElement;
+    if (toast) {
+        toast.classList.replace("flex", "hidden");
+        toast.classList.replace("opacity-100", "opacity-0");
+    }
+};
+//Function for saving form data
 const saveFormData = () => {
-    const investmentURL = formURL.value;
-    const investmentQuantity = Number(formQuantity.value);
-    const investmentCurrencyCode = Number(formCurrencyCode.value);
+    const investmentURL = formURL.value; //URL of item
+    const investmentQuantity = Number(formQuantity.value); //How many were purchased
+    const investmentCurrencyCode = Number(formCurrencyCode.value); //Currency used for purchase
     //Valid url is: https://steamcommunity.com/market/listings/{appID}/{marketHash}
     const tempURL = new URL(investmentURL);
     ///market/listings/{appID}/{marketHash}
     const path = tempURL.pathname;
     //[ '', 'market', 'listings', '{appID}', '{marketHash}' ]
     const directories = path.split("/");
-    const investmentAppID = directories[3];
-    const investmentMarketHash = directories[4];
-    //Needs to change commas into decimal points
-    //and remove both from quantity input.
+    const investmentAppID = directories[3]; //ID of item's game
+    const investmentMarketHash = directories[4]; //ID of item on market
+    //Convert user's item cost into number
     const investmentCost = Number(formCost.value);
+    //Store input data into variable
     const userInfo = {
         itemURL: investmentURL,
         appID: investmentAppID,
@@ -31,10 +80,14 @@ const saveFormData = () => {
         currencyCode: investmentCurrencyCode,
         cost: investmentCost,
     };
+    //Create investments array in localstorage if it doesn't exist
     if (localStorage.getItem("investments") === null) {
         let investments = [];
+        //Add user's form data into array
         investments.push(userInfo);
+        //Convert into valid format
         localStorage.setItem("investments", JSON.stringify(investments));
+        //If array exists, retrieve data, push new data into array, and save again
     }
     else {
         let storedInvestments = JSON.parse(localStorage.getItem("investments"));
@@ -42,23 +95,26 @@ const saveFormData = () => {
         localStorage.setItem("investments", JSON.stringify(storedInvestments));
     }
 };
-//Handle error with grabbing api data. probably do alert box alerting users to cors anywhere.
+//Fetch current data from steam's priceoverview API
 const fetchAPIData = async () => {
+    //Retrieve saved user data
     const investments = JSON.parse(localStorage.getItem("investments"));
+    //Retrieve market prices for each input investment through proxy to avoid CORS restrictions
     for (let investment of investments) {
         //Need to use https://cors-anywhere.herokuapp.com/corsdemo
         const apiURL = `https://cors-anywhere.herokuapp.com/https://steamcommunity.com/market/priceoverview/?currency=${investment.currencyCode}&appid=${investment.appID}&market_hash_name=${investment.marketHash}`;
         try {
             const response = await fetch(apiURL);
+            //Handling response failure
             if (!response.ok) {
+                displayToast(ToastCategory.APIRequestStatus, response.status);
                 console.log("Response: " + response);
-                console.log("Response Stringified: " + JSON.stringify(response));
-                throw new Error(`Error fetching market data: (${response.status})`);
+                throw new Error(`Error fetching market data: (Error ${response.status})`);
             }
             const apiData = await response.json();
             let formattedPrice = 0;
             let currency = "";
-            //Testing to see if this will allow non-existing market listings to be shown
+            //If item is unavailable on market, set price as null to allow it to still display
             if (apiData.lowest_price === undefined) {
                 apiData.lowest_price = null;
                 formattedPrice = null;
@@ -73,8 +129,7 @@ const fetchAPIData = async () => {
                 //Extract used currency.
                 currency = apiData.lowest_price.replace(/[0-9,.]+/g, "");
             }
-            console.log("Lowest price: " + apiData.lowest_price);
-            console.log("Currency: " + currency);
+            //Variable for saving API-retrieved data
             const investmentData = {
                 itemName: investment.marketHash,
                 quantity: investment.quantity,
@@ -83,10 +138,12 @@ const fetchAPIData = async () => {
                 cost: investment.cost,
                 currentPrice: formattedPrice,
             };
+            //Check if processed data is already present in user's storage, create array and push new data if not
             if (localStorage.getItem("processedData") === null) {
                 let processedInvestments = [];
                 processedInvestments.push(investmentData);
                 localStorage.setItem("processedData", JSON.stringify(processedInvestments));
+                //If it exists, retrieve data, push new data, and save the updated array
             }
             else {
                 let processedInvestments = JSON.parse(localStorage.getItem("processedData"));
@@ -99,6 +156,7 @@ const fetchAPIData = async () => {
         }
     }
 };
+//Method used during debugging to check on stored data
 const getProcessedData = () => {
     const storedData = localStorage.getItem("processedData");
     if (storedData !== null) {
@@ -106,7 +164,8 @@ const getProcessedData = () => {
         console.log(JSON.stringify(parsedStoredData));
     }
 };
-//Handle function when there are no investments to display.
+//TODO: Handle function when there are no investments to display.
+//Function for presenting the investment data to user
 const displayInvestments = async () => {
     //Update storage with up-to-date data.
     localStorage.removeItem("processedData");
@@ -116,32 +175,31 @@ const displayInvestments = async () => {
         const parsedStoredData = JSON.parse(storedData);
         let counter = 0;
         const grid = document.getElementById("investment-grid");
+        //Copy the empty template for each datapoint in stored data
         for (let datum of parsedStoredData) {
             let clone = document
                 .getElementById("investment-wrapper")
                 ?.cloneNode(true);
             clone.id = `investment-${counter}`;
             const currentInvestment = clone;
-            console.warn(`quantity-field of ${clone.id} is: ` +
-                clone.querySelector(".quantity-field"));
+            //Fill template with investment info
             const nameField = currentInvestment.querySelector(".name-field");
+            const quantityField = currentInvestment.querySelector(".quantity-field");
+            const costField = currentInvestment.querySelector(".cost-field");
+            const priceField = currentInvestment.querySelector(".price-field");
+            const profitField = currentInvestment.querySelector(".profit-field");
+            let profitCalculation;
+            const totalField = currentInvestment.querySelector(".total-field");
+            let totalProfit;
             if (nameField) {
                 nameField.textContent = decodeURI(datum.itemName);
             }
-            const quantityField = currentInvestment.querySelector(".quantity-field");
-            console.warn("quantityField is: " + quantityField);
-            if (!quantityField) {
-                console.error("quantity-field is null.");
-            }
             if (quantityField) {
-                console.log("quantity-field is not null!");
                 quantityField.textContent = datum.quantity.toString();
             }
-            const costField = currentInvestment.querySelector(".cost-field");
             if (costField) {
                 costField.textContent = datum.currencySymbol + datum.cost.toFixed(2);
             }
-            const priceField = currentInvestment.querySelector(".price-field");
             if (priceField) {
                 if (datum.currentPrice === null) {
                     priceField.textContent = "UNAVAILABLE";
@@ -151,20 +209,18 @@ const displayInvestments = async () => {
                         datum.currencySymbol + datum.currentPrice.toFixed(2);
                 }
             }
-            const profitField = currentInvestment.querySelector(".profit-field");
-            let profitCalculation;
             if (datum.currentPrice != null) {
                 profitCalculation = datum.currentPrice - datum.cost;
             }
             else {
                 profitCalculation = null;
             }
-            console.log(datum.currentPrice + " - " + datum.cost + " = " + profitCalculation);
             if (profitField) {
                 if (datum.currentPrice === null) {
                     profitField.textContent = "N/A";
                 }
                 else {
+                    //Calculate profit and colour-code value
                     if (profitCalculation) {
                         if (profitCalculation < 0) {
                             profitField.classList.add("text-red-500");
@@ -189,8 +245,6 @@ const displayInvestments = async () => {
                     }
                 }
             }
-            const totalField = currentInvestment.querySelector(".total-field");
-            let totalProfit;
             if (profitCalculation) {
                 totalProfit = profitCalculation * datum.quantity;
             }
@@ -202,24 +256,21 @@ const displayInvestments = async () => {
                     totalField.textContent = "N/A";
                 }
                 else {
-                    if (profitCalculation) {
+                    //Calculate and colour-code total profit
+                    if (profitCalculation && totalProfit) {
                         if (profitCalculation < 0) {
                             totalField.classList.add("text-red-500");
                             totalField.textContent =
-                                "-" +
-                                    datum.currencySymbol +
-                                    Math.abs(profitCalculation * datum.quantity).toFixed(2);
+                                "-" + datum.currencySymbol + Math.abs(totalProfit).toFixed(2);
                         }
                         else if (profitCalculation > 0) {
                             totalField.classList.add("text-green-500");
                             totalField.textContent =
-                                datum.currencySymbol +
-                                    Math.abs(profitCalculation * datum.quantity).toFixed(2);
+                                datum.currencySymbol + Math.abs(totalProfit).toFixed(2);
                         }
                         else {
                             totalField.textContent =
-                                datum.currencySymbol +
-                                    Math.abs(profitCalculation * datum.quantity).toFixed(2);
+                                datum.currencySymbol + Math.abs(totalProfit).toFixed(2);
                         }
                     }
                     else {
@@ -227,9 +278,8 @@ const displayInvestments = async () => {
                     }
                 }
             }
-            //Too many requests error right now. Check if works later.
-            clone.classList.remove("hidden");
-            clone.classList.add("flex");
+            clone.classList.replace("hidden", "flex");
+            //Add the filled-out template to grid
             if (grid) {
                 grid.appendChild(clone);
             }
@@ -245,12 +295,12 @@ const preventDecimal = (inputField) => {
 const preventNonNumber = (inputField) => {
     inputField.value = inputField.value.replace(/[^0-9]/g, "");
 };
-const quantityInput = document.getElementById("in-quantity");
-if (quantityInput) {
-    quantityInput.addEventListener("input", (event) => {
+if (formQuantity) {
+    formQuantity.addEventListener("input", (event) => {
         preventNonNumber(event.target);
     });
 }
+//Ensure consistent format when recording currency input
 const formatCurrencyInput = (inputField) => {
     //Normalise decimal point syntax
     if (inputField.value) {
@@ -272,23 +322,24 @@ const formatCurrencyInput = (inputField) => {
                 : inputField.value;
     }
 };
-const costInput = document.getElementById("in-cost");
-if (costInput) {
-    costInput.addEventListener("input", (event) => {
+if (formCost) {
+    formCost.addEventListener("input", (event) => {
         formatCurrencyInput(event.target);
     });
 }
+//Set all form values to be empty
 const resetForm = () => {
     formURL.value = "";
     formQuantity.value = "";
     formCost.value = "";
 };
+//Submit form without needing to reset the page
 if (form) {
     form.onsubmit = (event) => {
         event.preventDefault();
         if (form.checkValidity()) {
             saveFormData();
-            alert("Investment registered");
+            displayToast(ToastCategory.FormSubmitSuccess);
             resetForm();
         }
         else {
@@ -299,3 +350,9 @@ if (form) {
 else {
     console.log("No form found.");
 }
+//auto-load investments when visiting investments page
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.location.pathname.endsWith("investments.html")) {
+        displayInvestments();
+    }
+});
